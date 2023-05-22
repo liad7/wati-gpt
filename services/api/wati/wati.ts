@@ -1,14 +1,13 @@
 import axios from "axios"
 
 const BASE_URL = 'https://live-server-105712.wati.io/api/v1/'
-const { WATI_AUTH } = process.env
 
 const getAllContacts = (): Promise<[]> => {
     const options = {
         method: 'GET',
         url: BASE_URL + 'getContacts',
         headers: {
-            Authorization: WATI_AUTH
+            Authorization: 'Bearer ' + process.env.WATI_AUTH
         }
     }
 
@@ -26,7 +25,7 @@ const getChatHistoryByNumber = (phoneNum: string): Promise<string> => {
         method: 'GET',
         url: `${BASE_URL}getMessages/${phoneNum}`,
         headers: {
-            Authorization: WATI_AUTH
+            Authorization: 'Bearer ' + process.env.WATI_AUTH
         }
     }
 
