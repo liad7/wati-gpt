@@ -1,12 +1,16 @@
-import Image from 'next/image'
-import styles from './page.module.css'
-import { openAiService } from "../services/api/openAi/openAi";
 
-export default function Home() {
-  const message = openAiService.getAnswerFromGpt('how are you?')
+import { openAiService } from "../services/api/openAi/openAi";
+import { ChatCompletionResponseMessage } from 'openai/dist/api';
+
+export default async function Home() {
+  const message: ChatCompletionResponseMessage = await openAiService.getAnswerFromGpt('how are you?')
+  const { role, content } = message
+  console.log('content: ', content);
+  console.log('role: ', role);
+
   return (
     <main>
-      <h1>{message}</h1>
+      <h1>{content}</h1>
     </main>
   )
 }
