@@ -1,4 +1,5 @@
 import './globals.css'
+import { openAiService } from "../services/api/openAi/openAi";
 
 export const metadata = {
   title: 'Create Next App',
