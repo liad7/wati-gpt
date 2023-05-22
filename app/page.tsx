@@ -1,7 +1,7 @@
 
 import { openAiService } from "../services/api/openAi/openAi";
 import { ChatCompletionResponseMessage } from 'openai/dist/api';
-import { watiService } from '../services/api/wati/wati2';
+import { watiService } from '../services/api/wati/wati';
 
 export default async function Home() {
   const watiContact = await watiService.getContacts()
@@ -11,7 +11,6 @@ export default async function Home() {
 
   return (
     <main>
-
     </main>
   )
 }

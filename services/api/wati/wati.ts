@@ -1,45 +1,25 @@
-import axios from "axios"
+import axios from 'axios';
 
-const BASE_URL = 'https://live-server-105712.wati.io/api/v1/'
-
-const getAllContacts = (): Promise<[]> => {
-    const options = {
-        method: 'GET',
-        url: BASE_URL + 'getContacts',
-        headers: {
-            Authorization: process.env.WATI_ACCESS_TOKEN!
-        }
-    }
-    
-    return axios
-    .request(options)
-    .then(res => {
-        console.log(res.data)
-        return res.data
-    })
-    .catch(console.error)
+export const watiService = {
+    getContacts
 }
 
-const getChatHistoryByNumber = (phoneNum: string): Promise<string> => {
+async function getContacts() {
     const options = {
         method: 'GET',
-        url: `${BASE_URL}getMessages/${phoneNum}`,
+        url: 'https://live-server-105712.wati.io/api/v1/getContacts',
         headers: {
-            Authorization: process.env.WATI_ACCESS_TOKEN!
+            Authorization: `${process.env.WATI_ACCESS_TOKEN!}`
         }
-    }
+    };
 
     return axios
         .request(options)
-        .then(res => {
-            console.log(res.data)
-            return res.data
+        .then(function (response) {
+            return response.data
         })
-        .catch(console.error)
-}
+        .catch(function (error) {
+            console.error(error);
+        });
 
-
-export const watiService = {
-    getAllContacts,
-    getChatHistoryByNumber,
 }
