@@ -21,7 +21,6 @@ const getAllContacts = (): Promise<[]> => {
 }
 
 const getChatHistoryByNumber = (phoneNum: string): Promise<string> => {
-    console.log('process.env:', process.env);
     const options = {
         method: 'GET',
         url: `${BASE_URL}getMessages/${phoneNum}`,
