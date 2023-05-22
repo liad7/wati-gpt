@@ -7,7 +7,7 @@ export const openAiService = {
 }
 
 async function getAnswerFromGpt(prompt: string): Promise<ChatCompletionResponseMessage> {
-    console.log('prompt: ', prompt);
+
     try {
         const completion = await openai.createChatCompletion({
             model: "gpt-3.5-turbo",
