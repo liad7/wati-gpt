@@ -1,0 +1,51 @@
+[
+    {
+    "wAid":"",
+    "msgLength":"",
+    "customParams": [
+        {
+          "name": "name",
+          "value": "סמיון"
+        },
+        {
+          "name": "phone",
+          "value": "972509028293"
+        },
+        {
+          "name": "gender",
+          "value": "גבר"
+        },
+        {
+          "name": "couple_status",
+          "value": "נשוי"
+        },
+        {
+          "name": "relationship",
+          "value": "yes"
+        },
+        {
+          "name": "wedding_anniversary",
+          "value": "18/03/2010"
+        },
+        {
+          "name": "contact_own_address_city",
+          "value": "אור עקיבה"
+        },
+        {
+          "name": "contact_own_date_of_birth",
+          "value": "23/12/1972"
+        },
+        {
+          "name": "partners_name",
+          "value": "חנה"
+        },
+        {
+          "name": "partners_date_of_birth",
+          "value": "09/08/1983"
+        }
+      ]
+    },
+    {
+
+    }
+]
