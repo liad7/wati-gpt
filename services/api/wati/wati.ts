@@ -23,6 +23,3 @@ async function getContacts() {
         });
 
 }
-
-
-
