@@ -61,7 +61,7 @@ async function sendWatiSessionMessage(phoneNumber: string, message: string) {
 }
 
 // Usage
-sendWatiMessage('+1234567890', 'Hello, this is a test message');
+// sendWatiSessionMessage('+1234567890', 'Hello, this is a test message');
 
 
 // async function getParamsByChatHistory() {
