@@ -21,9 +21,9 @@ async function detectLanguage(input: string): Promise<string> {
     }
 }
 
-async function translateText(input: string, sourceLanguage: string): Promise<string | undefined> {
+async function translateText(input: string, sourceLanguage: string, target: string = 'en'): Promise<string | undefined> {
     try {
-        const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${encodeURI(input)}&source=${sourceLanguage}&target=en`
+        const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${encodeURI(input)}&source=${sourceLanguage}&target=${target}`
 
         const res = await axios.post(url)
         const translatedText: string = res.data.data.translations[0].translatedText
