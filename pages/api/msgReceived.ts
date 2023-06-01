@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             answer = await googleTranslateAPIService.translateText(answer, 'en', lang)
         }
         //post to wati the response of it all
-        watiService.sendWatiMessage(waId, answer)
+        watiService.sendWatiSessionMessage(waId, answer)
 
         // Send a response (if required)
         res.status(200).json({ message: 'Webhook received successfully' })
