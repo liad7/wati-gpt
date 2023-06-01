@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import { googleTranslateAPIService } from '../../services/api/googleTranslateAPI/googleTranslateAPI'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
