@@ -5,8 +5,15 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         // Process the webhook payload here
         const { body, headers } = req
 
-        // Handle the webhook data
-        // ...
+        //get from req the waId
+        //get from mongo the user attr by waId
+        //check user for lang attr
+        //if no detectLanguage(req.body.text)
+        //else const = user.lang
+        // google translate function translateText(req.body.text,"what the answer from before")
+        //do getAnswerFromGpt function with the translation
+        //google translate function from the ans from gpt
+        //post to wati the response of it all
 
         // Send a response (if required)
         res.status(200).json({ message: 'Webhook received successfully' })
