@@ -1,12 +1,13 @@
 
 // import { openAiService } from "../services/api/openAi/openAi";
 // import { ChatCompletionResponseMessage } from 'openai/dist/api';
-// import { watiService } from '../services/api/wati/wati';
+import { watiService } from '../services/api/wati/wati';
 import { Header } from "@/cmps/header/header";
 import { googleTranslateAPIService } from "../services/api/googleTranslateAPI/googleTranslateAPI"
 
 export default async function Home() {
   // const watiContact = await watiService.getContacts()
+  // const watiContact = await watiService.sendWatiSessionMessage('972545434384', "test")
 
   // const contactPhones = watiContact.contact_list.reduce((acc: any[], curr: { wAid: any; }) => {
   //   acc.push(curr.wAid)
