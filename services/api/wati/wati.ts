@@ -41,10 +41,47 @@ async function getChatHistory(phoneNum:string) {
     }
 }
 
-async function getParamsByChatHistory() {
-    const contacts = await getContacts()
-    const contactPhones = contacts.contact_list.reduce((acc: any[], curr: { wAid: any; }) => {
-        acc.push(curr.wAid)
-        return acc
-      }, [])
+async function sendWatiMessage(phoneNumber: string, message: string) {
+  const apiUrl = 'https://api.wati.io/v1/sendMessage';
+
+  const options = {
+    method: 'POST',
+    url: BASE_URL + 'getContacts',
+    headers: {
+        Authorization: `${process.env.WATI_ACCESS_TOKEN!}`
+    }
 }
+
+  const payload = {
+    phoneNumber,
+    message,
+  };
+
+  try {
+    const response = await axios.post(apiUrl, payload, {
+      headers: {
+        Authorization: 'Bearer YOUR_WATI_API_TOKEN',
+      },
+    });
+
+    if (response.data.success) {
+      console.log('Message sent successfully');
+    } else {
+      console.log('Failed to send message');
+    }
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
+}
+
+// Usage
+sendWatiMessage('+1234567890', 'Hello, this is a test message');
+
+
+// async function getParamsByChatHistory() {
+//     const contacts = await getContacts()
+//     const contactPhones = contacts.contact_list.reduce((acc: any[], curr: { wAid: any; }) => {
+//         acc.push(curr.wAid)
+//         return acc
+//       }, [])
+// }
