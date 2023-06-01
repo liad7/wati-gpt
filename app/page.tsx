@@ -7,7 +7,6 @@ import { googleTranslateAPIService } from "../services/api/googleTranslateAPI/go
 
 export default async function Home() {
   // const watiContact = await watiService.getContacts()
-  // console.log('watiContact: ', watiContact.contact_list[0].wAid);
 
   // const contactPhones = watiContact.contact_list.reduce((acc: any[], curr: { wAid: any; }) => {
   //   acc.push(curr.wAid)
