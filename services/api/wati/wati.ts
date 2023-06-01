@@ -5,6 +5,7 @@ const BASE_URL = 'https://live-server-105712.wati.io/api/v1/'
 export const watiService = {
     getContacts,
     getChatHistory,
+    sendWatiMessage,
 }
 
 async function getContacts() {
@@ -75,7 +76,7 @@ async function sendWatiMessage(phoneNumber: string, message: string) {
 }
 
 // Usage
-sendWatiMessage('+1234567890', 'Hello, this is a test message');
+// sendWatiMessage('+1234567890', 'Hello, this is a test message');
 
 
 // async function getParamsByChatHistory() {

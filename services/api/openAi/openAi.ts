@@ -6,7 +6,8 @@ export const openAiService = {
     getAnswerFromGpt
 }
 
-async function getAnswerFromGpt(prompt: string): Promise<ChatCompletionResponseMessage> {
+async function getAnswerFromGpt(prompt: string): Promise<string> {
+// async function getAnswerFromGpt(prompt: string): Promise<ChatCompletionResponseMessage> {
 
     try {
         const completion = await openai.createChatCompletion({
@@ -16,7 +17,6 @@ async function getAnswerFromGpt(prompt: string): Promise<ChatCompletionResponseM
 
         return completion.data.choices[0].message!
     } catch (err) {
-
         console.log('heerrrr:')
         throw (err)
     }
