@@ -15,12 +15,13 @@ export default async function Home() {
 
   // const message: ChatCompletionResponseMessage = await openAiService.getAnswerFromGpt('how are you?')
   // const  {role, content}  = message
-  googleTranslateAPIService.detectLanguage('אחשלי היקר מה איתך נשמה').then(console.log)
+  googleTranslateAPIService.detectLanguage('Длина исходного кода API').then(res => googleTranslateAPIService.translateText('Длина исходного кода API', res).then(console.log))
+  // googleTranslateAPIService.detectLanguage('אחשלי היקר מה איתך נשמה').then(res=>googleTranslateAPIService.translateText('אחשלי היקר מה איתך נשמה',res).then(console.log))
 
   return (
     <main className="main-container">
       <Header />
-      <h1>hello</h1>
+      <h1>hello i did a change</h1>
     </main>
   )
 }
