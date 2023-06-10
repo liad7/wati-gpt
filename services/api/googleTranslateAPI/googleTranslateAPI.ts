@@ -6,6 +6,7 @@ const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY
 export const googleTranslateAPIService = {
     detectLanguage,
     translateText,
+    translateMsg
 }
 
 async function detectLanguage(input: string): Promise<string> {
@@ -49,5 +50,14 @@ async function translateText(input: string, target: string): Promise<TranslatedT
             console.error('An unknown error occurred in translateText.');
         }
         throw err;
+    }
+}
+
+async function translateMsg(msg_body: string, target: string = 'en'): Promise<TranslatedTextResult | null> {
+    try {
+        return await translateText(msg_body, target);
+    } catch (err) {
+        console.error("Error in translating received message: ", err);
+        return null; // assign null to translatedReceivedMsg
     }
 }

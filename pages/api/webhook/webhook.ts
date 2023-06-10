@@ -3,16 +3,16 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import _ from 'lodash';
 import sanitize from 'mongo-sanitize';
 
-import { googleTranslateAPIService } from '../../services/api/googleTranslateAPI/googleTranslateAPI'
-import { usersService } from '../../services/users/users.service'
-import { openAiService } from '../../services/api/openAi/openAi'
-import { utilService } from '../../services/utils';
-import { TranslatedTextResult } from '../../interfaces/interfaces';
-import { whatsAppService } from '../../services/api/whatsAppApi/whatsApp.service';
+import { googleTranslateAPIService } from '../../../services/api/googleTranslateAPI/googleTranslateAPI'
+import { usersService } from '../../../services/users/users.service'
+import { openAiService } from '../../../services/api/openAi/openAi'
+import { utilService } from '../../../services/utils';
+import { TranslatedTextResult } from '../../../interfaces/interfaces';
+import { whatsAppService } from '../../../services/api/whatsAppApi/whatsApp.service';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    try {
 
+    try {
         if (req.method === 'POST') {
             let body = req.body;
 
@@ -27,13 +27,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     const phone_number_id = body.entry[0].changes[0].value.metadata.phone_number_id;
                     const _id = body.entry[0].changes[0].value.messages[0].from;
                     const sentAt = Date.now();
-                    const userName = sanitize(body.entry[0].changes[0].value.contacts[0].profile.name);
+                    let userName
+                    userName = sanitize(body.entry[0].changes[0].value.contacts[0].profile.name);
+                    let answer
+                    let user
+                    let answerFromTranslate
                     let lang = 'en'
                     let msg_body
+                    if (messageType != 'interactive') {
+                        msg_body = sanitize(body.entry[0].changes[0].value.messages[0].text.body);
+                    }
 
-                    if (!(messageType === 'text' || messageType === 'audio')) {
+                    try {
+                        answerFromTranslate = await googleTranslateAPIService.translateMsg(msg_body) as TranslatedTextResult
+                        lang = answerFromTranslate?.detectedSourceLanguage
+
+                    } catch (err) {
+                        console.log(`err from fetching mongo user with ${_id}`, err)
+                    }
+
+                    if (!(messageType === 'text' || messageType === 'interactive')) {
+                        // if (!(messageType === 'text' || messageType === 'audio' || messageType === 'interactive')) {
                         console.log(`Unsupported message type: ${messageType}`);
-                        await sendInSessionMsg(phone_number_id, _id, lang, `Sorry i can't understand any message except recording and text messages`);
+                        await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, `I can't understand any message except text messages`);
+                        // await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, `I can't understand any message except recording and text messages`);
                         res.status(200).json({ message: "Message type not supported." });
                         return;
                     }
@@ -41,19 +58,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     if (message.type === 'audio') {
                         // Extract the audio file ID
                         const audioFileId = message.audio.id;
-
                         whatsAppService.downloadAudio(audioFileId)
-
                         // Handle the audio message. For now, let's log the ID
                         console.log(`Received an audio message with ID: ${audioFileId}`);
                         return
-                    } else {
-                        msg_body = sanitize(body.entry[0].changes[0].value.messages[0].text.body);
                     }
 
-                    let answer
-                    let user
-                    let answerFromTranslate
+                    if (messageType === 'interactive') {
+                        const buttonId = message.interactive.button_reply.id;
+                        if (buttonId === 'approvedSubscribed') {
+                            try {
+                                user = await usersService.getUserById(_id);
+                            } catch (err) {
+                                console.log(`err fetching user from mongo with the id :${_id}`, err)
+                            }
+                            user['isSubscribed'] = true
+                            try {
+                                await usersService.update(user);
+                            } catch (err) {
+                                console.log('err from update after subscribed', err)
+                            }
+                        }
+                        res.status(200).json({ message: "Got inter" });
+                        return;
+                    }
 
                     try {
                         user = await usersService.getUserById(_id);
@@ -62,20 +90,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         console.log(`err fetching user from mongo with the id :${_id}`, err)
                     }
 
-                    try {
-                        answerFromTranslate = await translateMsg(msg_body) as TranslatedTextResult
-                        lang = answerFromTranslate?.detectedSourceLanguage
-
-                    } catch (err) {
-                        console.log(`err from fetching mongo user with ${_id}`, err)
+                    if (!user.isSubscribed) {
+                        const terms = 'https://bit.ly/3XeWCUp'
+                        //! change this to website url
+                        const privacy = 'https://bit.ly/3oVDH4a'
+                        //! change this to website url
+                        const preButtonMsg = `היי אני אדגר ואני עוזר אישי עם בינה מלאכותית, אני פועל דרך - ChatGPT | OPEN.AI . חשוב לשים לב כדי שאוכל לעזור לך, חובה עלייך לעבור על התקנון ועל מדיניות הפרטיות שיש כאן ומיד אחרי ללחוץ על הכפתור ״יש אישור״. הנה לינק לתקנון: ${terms} לינק למדיניות פרטיות: ${privacy}`
+                        // await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, preButtonMsg);
+                        await whatsAppService.sendButtonMessage(phone_number_id, _id, 'יש אישור', 'approvedSubscribed', lang, preButtonMsg)
+                        res.status(200).json({ message: "Did not approved terms and conditions." });
+                        return;
                     }
 
-                    if (user && user.inProgress) {
-
-                        await sendInSessionMsg(phone_number_id, _id, lang, 'אני עוד מטפל בבקשה הקודמת');
+                    if (user?.inProgress) {
+                        await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, 'אני עוד מטפל בבקשה הקודמת');
                         return
                     }
-                    await sendInSessionMsg(phone_number_id, _id, lang);
+                    await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang);
 
                     if (user) {
                         user.inProgress = true;
@@ -111,13 +142,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     user.currSessionMsgHistory.push(usersService.getEmptyMsg(answer, '972557044192', 'assistant', Date.now()));
 
                     // Translate answer back to Hebrew
-                    answerFromTranslate = await translateMsg(answer as string, lang)
+                    answerFromTranslate = await googleTranslateAPIService.translateMsg(answer as string, lang)
 
                     // Send the response message
                     if (answerFromTranslate?.translatedText == '') {
                         throw new Error('Translation resulted in empty message, not sending.');
                     }
-                    await sendInSessionMsg(phone_number_id, _id, lang, answerFromTranslate?.translatedText);
+                    await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, answerFromTranslate?.translatedText);
 
                     // Save user to mongo and update inProgress to false
                     user.inProgress = false;
@@ -155,35 +186,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(200).json({ message: 'Webhook received but an error occurred while processing.' });
     }
 
-}
-
-async function sendInSessionMsg(phone_number_id: string, _id: string, lang: string, msg = "קיבלתי את ההודעה שלך אני על זה") {
-    const autoReplay = await translateMsg(msg, lang)
-
-    try {
-        await axios.post(
-            `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.WHATSAPP_TOKEN}`,
-            {
-                messaging_product: 'whatsapp',
-                to: _id,
-                text: { body: autoReplay?.translatedText },
-            },
-            {
-                headers: { 'Content-Type': 'application/json' },
-            }
-        );
-        return true
-    } catch (err) {
-        console.log(`Error sending message for user ${_id}:`, err);
-        return false
-    }
-}
-
-async function translateMsg(msg_body: string, target: string = 'en'): Promise<TranslatedTextResult | null> {
-    try {
-        return await googleTranslateAPIService.translateText(msg_body, target);
-    } catch (err) {
-        console.error("Error in translating received message: ", err);
-        return null; // assign null to translatedReceivedMsg
-    }
 }

@@ -1,0 +1,19 @@
+{
+    "messages": [
+      {
+        "from": "PHONE_NUMBER_ID",
+        "id": "wamid.ID",
+        "timestamp": "TIMESTAMP",
+        "interactive": {
+          "button_reply": {
+            "id": "unique-button-identifier-here",
+            "title": "button-text"
+          },
+          "type": "button_reply"
+        },
+        "type": "interactive"
+      }
+    ],
+    "field": "messages"
+  }
+  
