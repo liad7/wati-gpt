@@ -1,0 +1,31 @@
+{
+    "object": "whatsapp_business_account",
+    "entry": [
+      {
+        "id": "WHATSAPP_BUSINESS_ACCOUNT_ID",
+        "changes": [
+          {
+            "value": {
+              "messaging_product": "whatsapp",
+              "metadata": {
+                "display_phone_number": "PHONE_NUMBER",
+                "phone_number_id": "PHONE_NUMBER_ID"
+              },
+              "messages": [
+                {
+                  "type": "text",
+                  "text": {
+                    "body": "Hello, this is a text message."
+                  },
+                  "from": "SENDER_ID",
+                  "timestamp": "MESSAGE_TIMESTAMP"
+                }
+              ]
+            },
+            "field": "messages"
+          }
+        ]
+      }
+    ]
+  }
+  

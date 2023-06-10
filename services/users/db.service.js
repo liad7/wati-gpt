@@ -8,7 +8,7 @@ let client = new MongoClient(MONGODB_URI, options)
 let clientPromise
 
 if (process.env.NODE_ENV !== 'production') {
-    if (global._mongoClientPromise) {
+    if (!global._mongoClientPromise) {
         global._mongoClientPromise = client.connect()
     }
 
@@ -18,18 +18,3 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export default clientPromise
-
-export async function getCollection(collectionName) {
-    try {
-        const client = await clientPromise
-        const db = await client.db()
-        const collection = await db.collection(collectionName)
-        return collection
-
-    } catch (err) {
-        logger.error('Failed to get Mongo collection', err)
-        throw err
-    }
-}
-
-

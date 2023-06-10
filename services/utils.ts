@@ -1,10 +1,13 @@
+import fuzzysort from 'fuzzysort';
+
 export const utilService = {
     makeId,
     makeLorem,
     getRandomIntInclusive,
     randomPastTime,
     saveToStorage,
-    loadFromStorage
+    loadFromStorage,
+    checkTextForSearchSuggestion
 }
 
 function makeId(length = 6) {
@@ -50,4 +53,41 @@ function saveToStorage(key: string, value: any) {
 function loadFromStorage(key: string) {
     const data = localStorage.getItem(key)
     return (data) ? JSON.parse(data) : undefined
+}
+
+function checkTextForSearchSuggestion(text: string | undefined): boolean {
+    console.log('text: ', text);
+    const searchPhrases = [
+        'search',
+        'search for',
+        'look up',
+        'find on the web',
+        "find",
+        'google',
+        'web',
+        'internet',
+        // Add more phrases that you think imply an internet search
+    ];
+
+    if (!text) return false
+
+    const lowerCaseText = text.toLowerCase();
+
+    // Check for exact matches with regex
+    for (const phrase of searchPhrases) {
+        const regex = new RegExp('\\b' + phrase + '\\b', 'i');
+        if (regex.test(lowerCaseText)) {
+            return true;
+        }
+    }
+
+    // Check for fuzzy matches with fuzzysort
+    for (const phrase of searchPhrases) {
+        const result = fuzzysort.single(phrase, lowerCaseText);
+        if (result && result.score > -20) {  // Adjust the score threshold to control how fuzzy the match can be
+            return true;
+        }
+    }
+
+    return false;
 }

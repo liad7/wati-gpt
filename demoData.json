@@ -1,0 +1,136 @@
+
+
+[
+    {
+        "_id": "972123456789",
+        "userName": "JohnDoe",
+        "signUpDate": 1641368400000,
+        "admin": false,
+        "lang": "he",
+        "inProgress": false,
+        "currSessionMsgHistory": [
+            {
+                "text": "שלום, איך אתה?",
+                "sender": {
+                    "_id": "972123456789",
+                    "name": "User"
+                },
+                "sentAt": 1641368400000
+            },
+            {
+                "text": "אני טוב, תודה!",
+                "sender": {
+                    "_id": "972557044192",
+                    "name": "Edgar"
+                },
+                "sentAt": 1641368500000
+            }
+        ],
+        "msgsHistory": [
+            {
+                "text": "שלום, איך אתה?",
+                "sender": {
+                    "_id": "972123456789",
+                    "name": "User"
+                },
+                "sentAt": 1641368400000
+            },
+            {
+                "text": "אני טוב, תודה!",
+                "sender": {
+                    "_id": "972557044192",
+                    "name": "Edgar"
+                },
+                "sentAt": 1641368500000
+            }
+        ]
+    },
+    {
+        "_id": "972987654321",
+        "userName": "JaneSmith",
+        "signUpDate": 1641368400000,
+        "admin": false,
+        "lang": "he",
+        "inProgress": false,
+        "currSessionMsgHistory": [
+            {
+                "text": "שלום, מה דעתך על כדורגל?",
+                "sender": {
+                    "_id": "972987654321",
+                    "name": "User"
+                },
+                "sentAt": 1641368400000
+            },
+            {
+                "text": "אני מאמינה שכדורגל הוא משחק מרתק ומרהיב שמגרה רגשות ומאפשר צפייה נהדרת!",
+                "sender": {
+                    "_id": "972557044192",
+                    "name": "Edgar"
+                },
+                "sentAt": 1641368500000
+            }
+        ],
+        "msgsHistory": [
+            {
+                "text": "שלום, מה דעתך על כדורגל?",
+                "sender": {
+                    "_id": "972987654321",
+                    "name": "User"
+                },
+                "sentAt": 1641368400000
+            },
+            {
+                "text": "אני מאמינה שכדורגל הוא משחק מרתק ומרהיב שמגרה רגשות ומאפשר צפייה נהדרת!",
+                "sender": {
+                    "_id": "972557044192",
+                    "name": "Edgar"
+                },
+                "sentAt": 1641368500000
+            }
+        ]
+    },
+    {
+        "_id": "972555555555",
+        "userName": "AliceGreen",
+        "signUpDate": 1641368400000,
+        "admin": false,
+        "lang": "he",
+        "inProgress": false,
+        "currSessionMsgHistory": [
+            {
+                "text": "שלום, איך אתה שחייה?",
+                "sender": {
+                    "_id": "972555555555",
+                    "name": "User"
+                },
+                "sentAt": 1641368400000
+            },
+            {
+                "text": "אני אוהבת לשחות, זה מרענן ומהנה!",
+                "sender": {
+                    "_id": "972557044192",
+                    "name": "Edgar"
+                },
+                "sentAt": 1641368500000
+            }
+        ],
+        "msgsHistory": [
+            {
+                "text": "שלום, איך אתה שחייה?",
+                "sender": {
+                    "_id": "972555555555",
+                    "name": "User"
+                },
+                "sentAt": 1641368400000
+            },
+            {
+                "text": "אני אוהבת לשחות, זה מרענן ומהנה!",
+                "sender": {
+                    "_id": "972557044192",
+                    "name": "Edgar"
+                },
+                "sentAt": 1641368500000
+            }
+        ]
+    }
+]
