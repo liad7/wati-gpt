@@ -1,24 +1,42 @@
 {
-    "object": "whatsapp_business_account",
-    "entry": [{
-      "id": "WHATSAPP_BUSINESS_ACCOUNT_ID",
-      "changes": [{
-        "value": {
-          "messaging_product": "whatsapp",
-          "metadata": {
-            "display_phone_number": "PHONE_NUMBER",
-            "phone_number_id": "PHONE_NUMBER_ID"
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "112403188542203",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "972557044192",
+              "phone_number_id": "113754175072571"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Or Dvir"
+                },
+                "wa_id": "972545434384"
+              }
+            ],
+            "messages": [
+              {
+                "from": "972545434384",
+                "id": "wamid.HBgMOTcyNTQ1NDM0Mzg0FQIAEhggRjY0RUQ4MUNFRjAwMDgwRjM0MUVFNDQ4NjNBNjI1RUQA",
+                "timestamp": "1686405758",
+                "type": "audio",
+                "audio": {
+                  "mime_type": "audio/ogg; codecs=opus",
+                  "sha256": "1FiQFUfPAn3YmjJtK63qX2vCImDJv6M3GpFyKYtUglE=",
+                  "id": "924347558732162",
+                  "voice": true
+                }
+              }
+            ]
           },
-          "messages": [{
-            "type": "audio",
-            "audio": {
-              "id": "AUDIO_FILE_ID",
-              "mime_type": "AUDIO_FILE_MIME_TYPE"
-            }
-          }]
-        },
-        "field": "messages"
-      }]
-    }]
-  }
-  
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}

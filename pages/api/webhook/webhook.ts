@@ -1,19 +1,26 @@
+// Import necessary modules and types
+
 import axios from 'axios'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import _ from 'lodash';
 import sanitize from 'mongo-sanitize';
 
+// Import service dependencies
 import { googleTranslateAPIService } from '../../../services/api/googleTranslateAPI/googleTranslateAPI'
 import { usersService } from '../../../services/users/users.service'
 import { openAiService } from '../../../services/api/openAi/openAi'
 import { utilService } from '../../../services/utils';
-import { TranslatedTextResult } from '../../../interfaces/interfaces';
+import { TranslatedTextResult, User } from '../../../interfaces/interfaces';
 import { whatsAppService } from '../../../services/api/whatsAppApi/whatsApp.service';
 
+// Main function to handle the API requests
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     try {
+        // Process POST requests
         if (req.method === 'POST') {
+
+            // Get the request body
             let body = req.body;
 
             console.log(JSON.stringify(body, null, 2));
@@ -23,39 +30,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 if (message) {
                     const messageType = message.type;
-                    // check if messageType is 'text' or 'audio', else return
                     const phone_number_id = body.entry[0].changes[0].value.metadata.phone_number_id;
                     const _id = body.entry[0].changes[0].value.messages[0].from;
                     const sentAt = Date.now();
                     let userName
                     userName = sanitize(body.entry[0].changes[0].value.contacts[0].profile.name);
                     let answer
-                    let user
+
                     let answerFromTranslate
                     let lang = 'en'
                     let msg_body
-                    if (messageType != 'interactive') {
-                        msg_body = sanitize(body.entry[0].changes[0].value.messages[0].text.body);
+                    let user: User = {
+                        _id: '',
+                        userName: '',
+                        signUpDate: 0,
+                        admin: false,
+                        lang: '',
+                        inProgress: false,
+                        isSubscribed: false,
+                        currSessionMsgHistory: [],
+                        msgsHistory: []
                     }
 
-                    try {
-                        answerFromTranslate = await googleTranslateAPIService.translateMsg(msg_body) as TranslatedTextResult
-                        lang = answerFromTranslate?.detectedSourceLanguage
-
-                    } catch (err) {
-                        console.log(`err from fetching mongo user with ${_id}`, err)
+                    if (messageType === 'text') {
+                        msg_body = sanitize(body.entry[0].changes[0].value.messages[0].text.body);
+                        try {
+                            answerFromTranslate = await googleTranslateAPIService.translateMsg(msg_body) as TranslatedTextResult
+                            lang = answerFromTranslate?.detectedSourceLanguage
+                        } catch (err) {
+                            // todo change error message
+                            console.log(`err from fetching mongo user with ${_id}`, err)
+                        }
                     }
 
                     if (!(messageType === 'text' || messageType === 'interactive')) {
                         // if (!(messageType === 'text' || messageType === 'audio' || messageType === 'interactive')) {
-                        console.log(`Unsupported message type: ${messageType}`);
                         await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, `I can't understand any message except text messages`);
                         // await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, `I can't understand any message except recording and text messages`);
                         res.status(200).json({ message: "Message type not supported." });
                         return;
                     }
 
-                    if (message.type === 'audio') {
+                    if (messageType === 'audio') {
                         // Extract the audio file ID
                         const audioFileId = message.audio.id;
                         whatsAppService.downloadAudio(audioFileId)
@@ -68,49 +84,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         const buttonId = message.interactive.button_reply.id;
                         if (buttonId === 'approvedSubscribed') {
                             try {
-                                user = await usersService.getUserById(_id);
+                                console.log('_id: ', _id);
+                                user = await usersService.getUserById(_id)
+                                console.log('user: from inter ', user);
+                                lang = user.lang
                             } catch (err) {
                                 console.log(`err fetching user from mongo with the id :${_id}`, err)
                             }
                             user['isSubscribed'] = true
-                            try {
-                                await usersService.update(user);
-                            } catch (err) {
-                                console.log('err from update after subscribed', err)
-                            }
                         }
+                        try {
+                            await updateInProgress(user, false)
+                            console.log('user after update: ', user);
+                        } catch (err) {
+                            console.log('err from update interactive', err)
+                        }
+                        try {
+
+                            await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, 'מעולה! איך אוכל לעזור?');
+                        } catch (err) {
+                            console.log('err', err)
+
+                        }
+
                         res.status(200).json({ message: "Got inter" });
                         return;
                     }
 
                     try {
                         user = await usersService.getUserById(_id);
-
+                        lang = user.lang
                     } catch (err) {
                         console.log(`err fetching user from mongo with the id :${_id}`, err)
                     }
 
-                    if (!user.isSubscribed) {
-                        const terms = 'https://bit.ly/3XeWCUp'
-                        //! change this to website url
-                        const privacy = 'https://bit.ly/3oVDH4a'
-                        //! change this to website url
-                        const preButtonMsg = `היי אני אדגר ואני עוזר אישי עם בינה מלאכותית, אני פועל דרך - ChatGPT | OPEN.AI . חשוב לשים לב כדי שאוכל לעזור לך, חובה עלייך לעבור על התקנון ועל מדיניות הפרטיות שיש כאן ומיד אחרי ללחוץ על הכפתור ״יש אישור״. הנה לינק לתקנון: ${terms} לינק למדיניות פרטיות: ${privacy}`
-                        // await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, preButtonMsg);
-                        await whatsAppService.sendButtonMessage(phone_number_id, _id, 'יש אישור', 'approvedSubscribed', lang, preButtonMsg)
-                        res.status(200).json({ message: "Did not approved terms and conditions." });
-                        return;
-                    }
-
-                    if (user?.inProgress) {
-                        await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, 'אני עוד מטפל בבקשה הקודמת');
-                        return
-                    }
-                    await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang);
-
                     if (user) {
-                        user.inProgress = true;
-                        await usersService.update(user);
+                        if (user.inProgress) {
+                            await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, 'אני עוד מטפל בבקשה הקודמת');
+                            res.status(200).json({ message: "User in progress" });
+                            return;
+                        } else {
+                            try {
+                                updateInProgress(user, true)
+                            } catch (err) {
+                                console.log('err could not update user in the End', err)
+                            }
+                        }
 
                         //!did not finish here
                         console.log(' utilService.checkTextForSearchSuggestion(translatedReceivedMsg):', utilService.checkTextForSearchSuggestion(answerFromTranslate?.translatedText))
@@ -123,10 +142,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         usersService.saveUser(user);
                     }
 
+                    if (!user.isSubscribed) {
+                        const terms = 'https://edgarbot.io/terms'
+                        const privacy = 'https://edgarbot.io/privacy'
+                        const preButtonMsg = `היי אני אדגר ואני עוזר אישי עם בינה מלאכותית, אני פועל דרך - ChatGPT | OPEN.AI . חשוב לשים לב כדי שאוכל לעזור לך, חובה עלייך לעבור על התקנון ועל מדיניות הפרטיות שיש כאן ומיד אחרי ללחוץ על הכפתור ״יש אישור״. הנה לינק לתקנון: ${terms} לינק למדיניות פרטיות: ${privacy}`
+                        // await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, preButtonMsg);
+                        try {
+                            await updateInProgress(user, false)
+                            console.log('user after update: ', user);
+                        } catch (err) {
+                            console.log('err from update interactive', err)
+                        }
+                        await whatsAppService.sendButtonMessage(phone_number_id, _id, 'יש אישור', 'approvedSubscribed', lang, preButtonMsg)
+                        res.status(200).json({ message: "Did not approved terms and conditions." });
+                        return;
+                    }
+
+                    await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang);
+
                     if (answerFromTranslate?.translatedText) {
                         user.currSessionMsgHistory.push(usersService.getEmptyMsg(answerFromTranslate?.translatedText, _id, userName, sentAt));
                     } else if (answerFromTranslate?.translatedText === null) {
-                        //! put a handle for fail
+                        try {
+                            await updateInProgress(user, false)
+                            console.log('user after update: ', user);
+                        } catch (err) {
+                            console.log('err from update interactive', err)
+                        }
+                        res.status(200).json({ message: "there is no text back from translation" });
+                        return;
                     }
 
                     try {
@@ -151,8 +195,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     await whatsAppService.sendInSessionMsg(phone_number_id, _id, lang, answerFromTranslate?.translatedText);
 
                     // Save user to mongo and update inProgress to false
-                    user.inProgress = false;
-                    await usersService.update(user);
+                    try {
+                        updateInProgress(user, false)
+                    } catch (err) {
+                        console.log('err could not update user in the End', err)
+                    }
                 } else {
                     console.log('Invalid body data: The expected entry or message data is missing.');
                 }
@@ -163,8 +210,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 res.status(400).json({ error: "Request body does not contain the expected 'object' property." });
             }
         } else if (req.method === 'GET') {
-            //! secure the body _id script and ??? and shit like that
-
             const verify_token = process.env.VERIFY_TOKEN;
             let mode = req.query['hub.mode'];
             let token = req.query['hub.verify_token'];
@@ -186,4 +231,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(200).json({ message: 'Webhook received but an error occurred while processing.' });
     }
 
+}
+
+async function updateInProgress(user: User, inProgress: boolean) {
+    user.inProgress = inProgress;
+    try {
+        await usersService.update(user);
+    } catch (err) {
+        console.log('err could not update user', err)
+    }
+    return user
 }

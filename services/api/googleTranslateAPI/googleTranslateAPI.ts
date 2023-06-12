@@ -28,6 +28,8 @@ async function detectLanguage(input: string): Promise<string> {
 }
 
 async function translateText(input: string, target: string): Promise<TranslatedTextResult> {
+    const characterCountIn = input.length
+
     try {
         const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&target=${target}&format=text`;
 
@@ -39,9 +41,12 @@ async function translateText(input: string, target: string): Promise<TranslatedT
 
         // Send the request
         const res: AxiosResponse<TranslationResponse> = await axios.post<TranslationResponse>(url, requestBody);
+
         const translatedText: string = res.data.data.translations[0].translatedText;
         const detectedSourceLanguage = res.data.data.translations[0].detectedSourceLanguage === 'iw' ? 'he' : res.data.data.translations[0].detectedSourceLanguage
-
+        const characterCountOut = translatedText.length
+        const sumCharacters = characterCountIn + characterCountOut
+        console.log('sumCharacters: ', sumCharacters);
         return { translatedText, detectedSourceLanguage };
     } catch (err: unknown) {
         if (err instanceof Error) {

@@ -89,7 +89,7 @@ function getEmptyUser(_id, userName, signUpDate, currSessionMsgHistory) {
     signUpDate,
     "admin": false,
     "lang": "he",
-    "inProgress": true,
+    "inProgress": false,
     "isSubscribed": false,
     currSessionMsgHistory: [currSessionMsgHistory],
     "msgsHistory": []
